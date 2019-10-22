@@ -15,6 +15,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Application\Model\Table\UserTable;
+use Application\Model\User;
 
 /**
  * @class IndexController
@@ -28,7 +29,6 @@ class IndexController extends AbstractActionController
 
     public function __construct(UserTable $user)
     {
-        dd('here');
         $this->user = $user;
     }
 
@@ -37,8 +37,34 @@ class IndexController extends AbstractActionController
         return new ViewModel();
     }
 
+    public function addUserAction()
+    {
+        $user = new User();
+        $user->name = "Bryan Brioso";
+        $user->position = "Developer";
+
+        $user = $this->user->save($user);
+        dd($user);
+    }
+
+    public function updateUserAction()
+    {
+        $id = 4;
+        $user = $this->user->get($id);
+        $user->name = "Bryan Brioso [Updated] 2";
+
+
+        $this->user->save($user, $id);
+        dd("end");
+    }
+
     public function debugAction()
     {
+        $users = $this->user->fetchAll();
+        dd($users);
+        foreach ($this->user->fetchAll() as $user) {
+            d($user->name);
+        }
         dd('end');
     }
 

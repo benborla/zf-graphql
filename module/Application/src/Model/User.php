@@ -16,7 +16,15 @@ class User extends AbstractModel
     public $position;
 
     /** @var \DateTime */
-    public $createdAt = date('Y-m-d H:i:s');
+    public $created_at;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct()
+    {
+        $this->created_at = date('Y-m-d H:i:s');
+    }
 
     /**
      * @return array

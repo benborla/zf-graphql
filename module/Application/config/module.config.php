@@ -12,12 +12,14 @@ use Application\Model\Table\UserTable;
 use Application\Model\User;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\ResultSet\ResultSet;
+use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Hydrator\ObjectPropertyHydrator;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
+use Application\Controller\GraphQLController;
 
 /**
  * @var \Zend\ServiceManager\ServiceManager $container
@@ -46,6 +48,16 @@ return [
                     ],
                 ],
             ],
+            'graphql' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/query',
+                    'defaults' => [
+                        'controller' => GraphQLController::class,
+                        'action' => 'query'
+                    ]
+                ]
+            ]
         ],
     ],
     'controllers' => [
@@ -56,6 +68,12 @@ return [
                     $container->get(UserTable::class)
                 );
             },
+
+            GraphQLController::class => function ($container) {
+                return new GraphQLController(
+                    $container->get(UserTable::class)
+                );
+            }
         ],
     ],
     'view_manager' => [
@@ -82,15 +100,13 @@ return [
             // User Table
             UserTable::class => function ($container) {
                 $tableGateway = $container->get('Application\Model\UserTableGateway');
-                dd('here');
-                return UserTable($tableGateway);
+                return new UserTable($tableGateway);
             },
             'Application\Model\UserTableGateway' => function ($container) {
                 $dbAdapter = $container->get(AdapterInterface::class);
-                $resultSetPrototype = new ResultSet();
-                $resultSetPrototype->setArrayObjectPrototype(new User());
+                $hydratingResultSet = new HydratingResultSet(new ObjectPropertyHydrator(), new User());
 
-                return new TableGateway('users', $dbAdapter, null, $resultSetPrototype);
+                return new TableGateway('users', $dbAdapter, null, $hydratingResultSet);
             },
             // end user table
 

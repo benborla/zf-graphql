@@ -27,7 +27,7 @@ abstract class AbstractTable
         string $id = 'id'
     ) {
         $this->tableGateway = $tableGateway;
-        $this->setId($id);
+        $this->setIdKey($id);
     }
 
     /**
@@ -41,7 +41,9 @@ abstract class AbstractTable
             return $this->fetchPaginatedResults();
         }
 
-        return $this->tableGateway->select();
+        $collection =  $this->tableGateway->select();
+
+        return $collection;
     }
 
     /**
@@ -51,7 +53,7 @@ abstract class AbstractTable
      */
     public function get(int $id)
     {
-        return $this->getBy($this->getId(), $id);
+        return $this->getBy($this->getIdKey(), $id);
     }
 
     /**
@@ -79,12 +81,13 @@ abstract class AbstractTable
      *
      * @return mixed
      */
-    public function save(Model $model)
+    public function save($model)
     {
         $data = $model->toArray();
         $id = $model->getId();
 
         if (null === $id || 0 === $id) {
+            unset($data[$this->getIdKey()]);
             return $this->tableGateway->insert($data);
         }
 
@@ -95,7 +98,7 @@ abstract class AbstractTable
             ));
         }
 
-        return $this->tableGateway->update($data, [$this->getId() => $id]);
+        return $this->tableGateway->update($data, [$this->getIdKey() => $id]);
     }
 
     /**
@@ -113,7 +116,7 @@ abstract class AbstractTable
     /**
      * @return int
      */
-    public function getId(): int
+    public function getIdKey(): string
     {
         return $this->id;
     }
@@ -123,7 +126,7 @@ abstract class AbstractTable
      *
      * @return \App\Model\Table\AbstractTable
      */
-    public function setId(string $id)
+    public function setIdKey(string $id)
     {
         $this->id = $id;
 

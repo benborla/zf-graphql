@@ -8,11 +8,11 @@ abstract class AbstractModel
     public $id;
 
     /**
-     * @param int $id
+     * @param int|null $id
      *
      * @return \App\Model\AbstractModel
      */
-    public function setId(int $id)
+    public function setId(?int $id)
     {
         $this->id = $id;
 
@@ -20,9 +20,9 @@ abstract class AbstractModel
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
