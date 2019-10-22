@@ -7,9 +7,21 @@
 
 namespace Application;
 
+use Application\Controller\IndexController;
+use Application\Model\Table\UserTable;
+use Application\Model\User;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Adapter\AdapterInterface;
+use Zend\Db\ResultSet\ResultSet;
+use Zend\Db\TableGateway\TableGateway;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
+
+/**
+ * @var \Zend\ServiceManager\ServiceManager $container
+ */
 
 return [
     'router' => [
@@ -19,7 +31,7 @@ return [
                 'options' => [
                     'route'    => '/',
                     'defaults' => [
-                        'controller' => Controller\IndexController::class,
+                        'controller' => IndexController::class,
                         'action'     => 'index',
                     ],
                 ],
@@ -29,7 +41,7 @@ return [
                 'options' => [
                     'route'    => '/application[/:action]',
                     'defaults' => [
-                        'controller' => Controller\IndexController::class,
+                        'controller' => IndexController::class,
                         'action'     => 'index',
                     ],
                 ],
@@ -38,7 +50,12 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\IndexController::class => InvokableFactory::class,
+            // IndexController::class => InvokableFactory::class 
+            IndexController::class => function ($container) {
+                return new IndexController(
+                    $container->get(UserTable::class)
+                );
+            },
         ],
     ],
     'view_manager' => [
@@ -60,4 +77,23 @@ return [
             'ViewJsonStrategy'
         ]
     ],
+    'service_manager' => [
+        'factories' => [
+            // User Table
+            UserTable::class => function ($container) {
+                $tableGateway = $container->get('Application\Model\UserTableGateway');
+                dd('here');
+                return UserTable($tableGateway);
+            },
+            'Application\Model\UserTableGateway' => function ($container) {
+                $dbAdapter = $container->get(AdapterInterface::class);
+                $resultSetPrototype = new ResultSet();
+                $resultSetPrototype->setArrayObjectPrototype(new User());
+
+                return new TableGateway('users', $dbAdapter, null, $resultSetPrototype);
+            },
+            // end user table
+
+        ]
+    ]
 ];

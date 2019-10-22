@@ -14,12 +14,32 @@ use GraphQL\Type\Schema;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
+use Application\Model\Table\UserTable;
 
+/**
+ * @class IndexController
+ *
+ * https://github.com/geerteltink/zf3-album-tutorial/blob/master/module/Album/Module.php
+ */
 class IndexController extends AbstractActionController
 {
+    /** @var \Application\Model\Table\UserTable */
+    private $user;
+
+    public function __construct(UserTable $user)
+    {
+        dd('here');
+        $this->user = $user;
+    }
+
     public function indexAction()
     {
         return new ViewModel();
+    }
+
+    public function debugAction()
+    {
+        dd('end');
     }
 
     public function queryAction()
@@ -84,4 +104,4 @@ class IndexController extends AbstractActionController
             'name' => ''
         ]);
     }
-}
+} // End class IndexController

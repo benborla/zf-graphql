@@ -1,41 +1,27 @@
 <?php
 
-namespace App\Model;
-// https://github.com/geerteltink/zf3-album-tutorial/blob/master/module/Album/src/Model/Album.php
-class User
+namespace Application\Model;
+
+use Application\Model\AbstractModel;
+
+class User extends AbstractModel
 {
-    /**
-     * @var int
-     */
+    /** @var int */
     public $id;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $name;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $position;
 
-    /**
-     * @var \DateTime
-     */
-    public $createdAt;
-
-    /**
-     * @{inheritDoc}
-     */
-    public function __construct()
-    {
-        $this->createdAt = date('Y-m-d H:i:s');
-    }
+    /** @var \DateTime */
+    public $createdAt = date('Y-m-d H:i:s');
 
     /**
      * @return array
      */
-    public function getArrayCopy()
+    public function toArray(): array
     {
         return get_object_vars($this);
     }
