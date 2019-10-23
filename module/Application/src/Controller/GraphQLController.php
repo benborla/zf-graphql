@@ -12,6 +12,7 @@ use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use GraphQL\Type\Definition\Type;
 use Application\GraphQL\Type\UserType;
+use Application\GraphQL\Type\QueryType;
 
 /**
  * @class GraphQLController
@@ -34,27 +35,42 @@ class GraphQLController extends AbstractActionController
      */
     public function queryAction()
     {
-        $q = $this->getDataRequest()['query'];
-        $query = $q['query'] ?? null;
-        $variables = $q['variables'] ?? [];
-
-        $data = $this->user->fetchAll()->toArray();
+        $request  = $this->getDataRequest();
+        $query = $request['query'];
+        $variables = $request['variables'];
+        // $data = $this->user->fetchAll()->toArray();
 
         $schema = new Schema([
-            'query' => new UserType()
+            'query' => $this->getQueryConfig()
         ]);
 
-        $result = GraphQL::executeQuery(
-            $schema,
-            $query,
-            $data,
-            null,
-            $variables
-        );
+        $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
+        $output = $result->toArray();
 
-        return new JsonModel($result->toArray(true));
+        return new JsonModel($output);
     }
 
+    protected function getQueryConfig()
+    {
+        return new ObjectType([
+            'name' => 'Query',
+            'fields' => [
+                'users' => [
+                    'type' => new UserType(),
+                    'args' => [
+                        'id' => Type::int(),
+                    ],
+                    'resolve' => function ($root, $args) {
+                        if ($id = $args['id']) {
+                            return $this->user->get($id);
+                        }
+
+                        return $this->user->fetchAll()->toArray();
+                    }
+                ]
+            ]
+        ]);
+    }
 
     /**
      * @return array
@@ -65,7 +81,6 @@ class GraphQLController extends AbstractActionController
         $input = json_decode($rawInput, true);
         $query = $input['query'];
         $variableValues = isset($input['variables']) ? $input['variables'] : null;
-
 
         return [
             'query' => $query,

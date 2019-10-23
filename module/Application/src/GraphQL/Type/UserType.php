@@ -18,11 +18,11 @@ class UserType extends ObjectType
     public function __construct()
     {
         $config = [
-            'name' => 'User',
+            'name' => 'Users',
             'description' => 'User collection',
             'fields' => function () {
                 return [
-                    'id' => Type::id(),
+                    'id' => Type::int(),
                     'name' => [
                         'type' => Type::string()
                     ],
