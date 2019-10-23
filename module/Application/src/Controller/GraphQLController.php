@@ -13,6 +13,8 @@ use GraphQL\Type\Schema;
 use GraphQL\Type\Definition\Type;
 use Application\GraphQL\Type\UserType;
 use Application\GraphQL\Type\QueryType;
+use Application\GraphQL\Types;
+use Application\Model\User;
 
 /**
  * @class GraphQLController
@@ -40,32 +42,98 @@ class GraphQLController extends AbstractActionController
         $variables = $request['variables'];
         // $data = $this->user->fetchAll()->toArray();
 
+        // move this to the UserTable 
+        // make it static so it can be called here
         $schema = new Schema([
-            'query' => $this->getQueryConfig()
+            'query' => $this->getQueryConfig(),
+            'mutation' => $this->getMutationConfig()
         ]);
 
-        $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
+        $result = GraphQL::executeQuery($schema, $query, null, null, $variables);
         $output = $result->toArray();
 
         return new JsonModel($output);
     }
 
-    protected function getQueryConfig()
+    /**
+     * @return \GraphQL\Type\Definition\ObjectType
+     */
+    protected function getQueryConfig(): ObjectType
     {
         return new ObjectType([
             'name' => 'Query',
             'fields' => [
                 'users' => [
-                    'type' => new UserType(),
+                    'type' => Type::listOf(Types::user()),
+                    'resolve' => function ($root, $args) {
+                        return $this->user->fetchAll();
+                    }
+                ],
+                'user' => [
+                    'type' => Types::user(),
                     'args' => [
-                        'id' => Type::int(),
+                        'id' => Type::nonNull(Type::int()),
                     ],
                     'resolve' => function ($root, $args) {
-                        if ($id = $args['id']) {
-                            return $this->user->get($id);
+                        return $this->user->get($args['id']);
+                    }
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * @return ObjectType
+     */
+    protected function getMutationConfig(): ObjectType
+    {
+        $user = new User();
+
+        return new ObjectType([
+            'name' => 'Mutation',
+            'fields' => [
+                'createUser' => [
+                    'type' => Types::user(),
+                    'args' => [
+                        'name' => Type::nonNull(Type::string()),
+                        'position' => Type::nonNull(Type::string())
+                    ],
+                    'resolve' => function ($create, $args) use ($user) {
+                        $user->name = $args['name'];
+                        $user->position = $args['position'];
+
+                        return $this->user->save($user);
+                    }
+                ],
+                'updateUser' => [
+                    'type' => Types::user(),
+                    'args' => [
+                        'id' => Type::nonNull(Type::int()),
+                        'name' => Type::string(),
+                        'position' => Type::string()
+                    ],
+                    'resolve' => function ($update, $args) {
+                        $id = $args['id'];
+                        $user = $this->user->get($id);
+                        $user->name = $args['name'] ?? $user->name;
+                        $user->position = $args['position'] ?? $user->position;
+
+                        return $this->user->save($user, $id);
+                    }
+
+                ],
+                'deleteUser' => [
+                    'type' => Type::boolean(),
+                    'args' => [
+                        'id' => Type::nonNull(Type::int())
+                    ],
+                    'resolve' => function ($delete, $args) {
+                        $id = $args['id'] ?? null;
+                        if ($this->user->delete($id)) {
+                            return true;
                         }
 
-                        return $this->user->fetchAll()->toArray();
+                        return false;
                     }
                 ]
             ]

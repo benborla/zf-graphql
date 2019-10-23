@@ -88,7 +88,12 @@ abstract class AbstractTable
 
         if (null === $id || 0 === $id) {
             unset($data[$this->getIdKey()]);
-            return $this->tableGateway->insert($data);
+            if ($this->tableGateway->insert($data)) {
+                $id = $this->tableGateway->getLastInsertValue();
+                return $this->get($id);
+            }
+
+            return;
         }
 
         if (!$this->get($id)) {
@@ -98,19 +103,19 @@ abstract class AbstractTable
             ));
         }
 
-        return $this->tableGateway->update($data, [$this->getIdKey() => $id]);
+        if ($this->tableGateway->update($data, [$this->getIdKey() => $id])) {
+            return $this->get($id);
+        }
     }
 
     /**
      * @param int $id
      *
-     * @return \App\Model\Table\AbstractTable
+     * @return bool
      */
     public function delete(int $id)
     {
-        $this->tableGateway->delete([$this->getId() => $id]);
-
-        return $this;
+        return $this->tableGateway->delete([$this->getIdKey() => $id]);
     }
 
     /**

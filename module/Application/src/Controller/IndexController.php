@@ -50,11 +50,13 @@ class IndexController extends AbstractActionController
     public function updateUserAction()
     {
         $id = 4;
+        dd($this->user->delete($id));
         $user = $this->user->get($id);
         $user->name = "Bryan Brioso [Updated] 2";
+        $user->position = "Senior Dev";
 
 
-        $this->user->save($user, $id);
+        dd($this->user->save($user, $id));
         dd("end");
     }
 
