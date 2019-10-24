@@ -94,7 +94,8 @@ abstract class AbstractTable
      */
     public function save($model)
     {
-        $data = $model->toArray();
+        $data = $model->getArrayCopy();
+        dd($data);
         $id = $model->getId();
 
         if (null === $id || 0 === $id) {

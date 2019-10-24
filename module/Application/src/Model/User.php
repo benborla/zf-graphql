@@ -18,6 +18,15 @@ class User extends AbstractModel
     /** @var \DateTime */
     public $created_at;
 
+    /** @var \Application\Model\Post */
+    public $posts;
+
+    /** @var array */
+    protected $relations = [
+        'posts' => 'posts'
+    ];
+
+
     /**
      * {@inheritDoc}
      */
@@ -25,13 +34,4 @@ class User extends AbstractModel
     {
         $this->created_at = date('Y-m-d H:i:s');
     }
-
-    /**
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return get_object_vars($this);
-    }
-
 }

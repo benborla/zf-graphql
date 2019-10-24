@@ -49,8 +49,7 @@ class IndexController extends AbstractActionController
 
     public function updateUserAction()
     {
-        $id = 4;
-        dd($this->user->delete($id));
+        $id = 6;
         $user = $this->user->get($id);
         $user->name = "Bryan Brioso [Updated] 2";
         $user->position = "Senior Dev";
@@ -62,11 +61,19 @@ class IndexController extends AbstractActionController
 
     public function debugAction()
     {
-        $users = $this->user->fetchAll(false, ['name' => 'Bryan', 'position' => 'Developer']);
-        dd($users);
-        foreach ($this->user->fetchAll(false, ['name' => 'Bryan', 'position' => 'Developer']) as $user) {
-            d($user->name);
-        }
+        $user = new User();
+        $user->exchangeArray([
+            'id' => 1,
+            'name' => 'test',
+            'position' => 'hello'
+        ]);
+
+        dd($user);
+        // $users = $this->user->fetchAll(false, ['name' => 'Bryan', 'position' => 'Developer']);
+        // dd($users);
+        // foreach ($this->user->fetchAll(false, ['name' => 'Bryan', 'position' => 'Developer']) as $user) {
+        //     d($user->name);
+        // }
         dd('end');
     }
 

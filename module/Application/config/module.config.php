@@ -9,17 +9,13 @@ namespace Application;
 
 use Application\Controller\IndexController;
 use Application\Model\Table\UserTable;
-use Application\Model\User;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\ResultSet\HydratingResultSet;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Hydrator\ObjectPropertyHydrator;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 use Application\Controller\GraphQLController;
+use Application\Model\Factory\UserTableFactory;
+use Application\Model\Factory\PostTableFactory;
 
 /**
  * @var \Zend\ServiceManager\ServiceManager $container
@@ -62,8 +58,9 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            // IndexController::class => InvokableFactory::class 
+            // IndexController::class => InvokableFactory::class
             IndexController::class => function ($container) {
+                // dd($container);
                 return new IndexController(
                     $container->get(UserTable::class)
                 );
@@ -97,19 +94,7 @@ return [
     ],
     'service_manager' => [
         'factories' => [
-            // User Table
-            UserTable::class => function ($container) {
-                $tableGateway = $container->get('Application\Model\UserTableGateway');
-                return new UserTable($tableGateway);
-            },
-            'Application\Model\UserTableGateway' => function ($container) {
-                $dbAdapter = $container->get(AdapterInterface::class);
-                $hydratingResultSet = new HydratingResultSet(new ObjectPropertyHydrator(), new User());
-
-                return new TableGateway('users', $dbAdapter, null, $hydratingResultSet);
-            },
-            // end user table
-
+            UserTable::class => UserTableFactory::class
         ]
     ]
 ];
