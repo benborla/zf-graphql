@@ -18,14 +18,13 @@ class User extends AbstractModel
     /** @var \DateTime */
     public $created_at;
 
-    /** @var \Application\Model\Post */
-    public $posts;
+    /** @var \Application\Model\Post[] */
+    private $posts;
 
     /** @var array */
     protected $relations = [
         'posts'
     ];
-
 
     /**
      * {@inheritDoc}
@@ -36,22 +35,22 @@ class User extends AbstractModel
     }
 
     /**
-     * @param \Application\Model\Post $post
+     * @param \Application\Model\Post[] $post
      *
      * @return \Application\Model\User
      */
-    public function setPosts(Post $post)
+    public function setPosts($post)
     {
-        $this->post = $post;
+        $this->posts = $post;
 
         return $this;
     }
 
     /**
-     * @return Post
+     * @return \Applicaiton\Model\Post[]
      */
-    public function getPost(): Post
+    public function getPosts(): Post
     {
-        return $this->post;
+        return $this->posts;
     }
 }

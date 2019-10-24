@@ -11,6 +11,7 @@ use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\ObjectPropertyHydrator;
+use Application\Model\Hydrator\UserHydrator;
 
 class UserTableFactory
 {
@@ -19,7 +20,7 @@ class UserTableFactory
     public function __invoke(ContainerInterface $container)
     {
         $hydrator = new HydratingResultSet(
-            new ObjectPropertyHydrator(),
+            new UserHydrator(),
             new User()
         );
 
