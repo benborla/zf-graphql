@@ -49,11 +49,17 @@ abstract class AbstractModel
      */
     public function getArrayCopy(): array
     {
-        // @Todo find a way to remove the property that is in
-        // relations
-        d($this->getRelations());
-        d(get_object_vars($this));
-        return array_intersect_assoc($this->getRelations(), get_object_vars($this));
+        $props = get_object_vars($this);
+
+        foreach ($props as $prop => $value) {
+            if (in_array($prop, $this->getRelations())) {
+                unset($props[$prop]);
+            }
+        }
+
+        unset($props['relations']);
+
+        return $props;
     }
 
     /**

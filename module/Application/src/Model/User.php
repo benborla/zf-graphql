@@ -23,7 +23,7 @@ class User extends AbstractModel
 
     /** @var array */
     protected $relations = [
-        'posts' => 'posts'
+        'posts'
     ];
 
 
@@ -33,5 +33,25 @@ class User extends AbstractModel
     public function __construct()
     {
         $this->created_at = date('Y-m-d H:i:s');
+    }
+
+    /**
+     * @param \Application\Model\Post $post
+     *
+     * @return \Application\Model\User
+     */
+    public function setPosts(Post $post)
+    {
+        $this->post = $post;
+
+        return $this;
+    }
+
+    /**
+     * @return Post
+     */
+    public function getPost(): Post
+    {
+        return $this->post;
     }
 }

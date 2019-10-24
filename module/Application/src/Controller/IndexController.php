@@ -40,8 +40,8 @@ class IndexController extends AbstractActionController
     public function addUserAction()
     {
         $user = new User();
-        $user->name = "Bryan Brioso";
-        $user->position = "Developer";
+        $user->name = "test etsjt";
+        $user->position = "Admin";
 
         $user = $this->user->save($user);
         dd($user);
@@ -68,7 +68,7 @@ class IndexController extends AbstractActionController
             'position' => 'hello'
         ]);
 
-        dd($user);
+        dd($user->getArrayCopy());
         // $users = $this->user->fetchAll(false, ['name' => 'Bryan', 'position' => 'Developer']);
         // dd($users);
         // foreach ($this->user->fetchAll(false, ['name' => 'Bryan', 'position' => 'Developer']) as $user) {
