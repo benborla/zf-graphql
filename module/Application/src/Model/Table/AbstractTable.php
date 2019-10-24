@@ -32,16 +32,27 @@ abstract class AbstractTable
 
     /**
      * @param bool $paginated
+     * @param null|array $criteria
      *
      * @return \Zend\Db\Sql\Select|\Zend\Paginator\Paginator
      */
-    public function fetchAll($paginated = false)
+    public function fetchAll($paginated = false, array $criteria = [])
     {
         if ($paginated) {
             return $this->fetchPaginatedResults();
         }
 
-        $collection =  $this->tableGateway->select();
+        $select = $this->tableGateway->getSql()->select();
+
+        if (is_array($criteria) && count($criteria)) {
+            foreach ($criteria as $field => $value) {
+                $select->where->like($field, "%$value%");
+            }
+        }
+
+        $collection =  $this->tableGateway->selectWith($select);
+
+        // dd($this->tableGateway->getSql()->getSqlstringForSqlObject($select));
 
         return $collection;
     }

@@ -65,14 +65,18 @@ class GraphQLController extends AbstractActionController
             'fields' => [
                 'users' => [
                     'type' => Type::listOf(Types::user()),
+                    'args' => [
+                        'name' => Type::string(),
+                        'position' => Type::string(),
+                    ],
                     'resolve' => function ($root, $args) {
-                        return $this->user->fetchAll();
+                        return $this->user->fetchAll(false, $args);
                     }
                 ],
                 'user' => [
                     'type' => Types::user(),
                     'args' => [
-                        'id' => Type::nonNull(Type::int()),
+                        'id' => Type::int(),
                     ],
                     'resolve' => function ($root, $args) {
                         return $this->user->get($args['id']);

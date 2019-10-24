@@ -62,9 +62,9 @@ class IndexController extends AbstractActionController
 
     public function debugAction()
     {
-        $users = $this->user->fetchAll();
+        $users = $this->user->fetchAll(false, ['name' => 'Bryan', 'position' => 'Developer']);
         dd($users);
-        foreach ($this->user->fetchAll() as $user) {
+        foreach ($this->user->fetchAll(false, ['name' => 'Bryan', 'position' => 'Developer']) as $user) {
             d($user->name);
         }
         dd('end');
