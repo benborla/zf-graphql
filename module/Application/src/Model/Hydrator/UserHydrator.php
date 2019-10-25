@@ -24,8 +24,6 @@ class UserHydrator extends ObjectPropertyHydrator
 
         $user = new User();
         $user->exchangeArray($data);
-        // @todo find a way to fetch posts 
-        $user->setPosts(['pisti']);
 
         return $user;
     }

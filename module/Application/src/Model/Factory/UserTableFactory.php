@@ -20,7 +20,7 @@ class UserTableFactory
     public function __invoke(ContainerInterface $container)
     {
         $hydrator = new HydratingResultSet(
-            new UserHydrator(),
+            new ObjectPropertyHydrator(),
             new User()
         );
 

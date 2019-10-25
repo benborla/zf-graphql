@@ -50,7 +50,7 @@ abstract class AbstractTable
             }
         }
 
-        $collection =  $this->tableGateway->selectWith($select);
+        $collection = $this->tableGateway->selectWith($select);
 
         // dd($this->tableGateway->getSql()->getSqlstringForSqlObject($select));
 

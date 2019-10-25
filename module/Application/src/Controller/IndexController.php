@@ -61,6 +61,7 @@ class IndexController extends AbstractActionController
 
     public function debugAction()
     {
+        dd($this->user::usersQuery());
         $user = new User();
         $user->exchangeArray([
             'id' => 1,
