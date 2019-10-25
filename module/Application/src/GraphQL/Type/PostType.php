@@ -11,28 +11,30 @@ use GraphQL\Type\Definition\Type;
 use Application\GraphQL\Types;
 
 /**
- * @class UserType
+ * @class PostType
  */
-class UserType extends ObjectType
+class PostType extends ObjectType
 {
     public function __construct()
     {
         $config = [
-            'name' => 'User',
-            'description' => 'User collection',
+            'name' => 'Post',
+            'description' => 'Post collection',
             'fields' => function () {
                 return [
                     'id' => Type::int(),
-                    'name' => [
+                    'user' => [
+                        'type' => Types::user()
+                    ],
+                    'title' => [
                         'type' => Type::string()
                     ],
-                    'position' => [
+                    'content' => [
                         'type' => Type::string()
                     ],
                     'created_at' => [
                         'type' => Type::string()
                     ],
-                    'posts' => Type::listOf(Types::post())
                 ];
             },
             'resolveField' => function($user, $args, $context, ResolveInfo $info) {

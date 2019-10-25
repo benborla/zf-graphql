@@ -5,9 +5,9 @@ namespace Application\Model\Table;
 use Application\GraphQL\Type\QueryType;
 use Application\GraphQL\Type\UserType;
 use Application\GraphQL\Types;
+use Application\Model\Post;
 use Application\Model\Table\AbstractTable;
 use Application\Model\User;
-use Application\Model\Post;
 use GraphQL\Type\Definition\Type;
 
 class UserTable extends AbstractTable
@@ -109,6 +109,12 @@ class UserTable extends AbstractTable
                 return false;
             }
         ];
+    }
+
+    public function fetchAll()
+    {
+        // modify this one so we would be able to fetch posts relationships
+        return parent::fetchAll();
     }
 
     /**

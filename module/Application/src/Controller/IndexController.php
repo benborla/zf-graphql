@@ -63,7 +63,7 @@ class IndexController extends AbstractActionController
     {
         $user = $this->user->get(2);
         d($user);
-        $posts = $this->user->getPosts(2);
+        $posts = $this->user->getUserAndPosts(33);
         dd($posts);
         dd($this->user::usersQuery());
         $user = new User();
