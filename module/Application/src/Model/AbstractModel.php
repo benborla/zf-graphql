@@ -5,9 +5,7 @@ namespace Application\Model;
 abstract class AbstractModel
 {
     /** @var array */
-    protected $relations = [
-        'relations'
-    ];
+    protected $relations = [];
 
     /** @var int */
     public $id;
@@ -40,7 +38,7 @@ abstract class AbstractModel
         $props = $this->getArrayCopy();
 
         foreach ($props as $prop => $value) {
-            $this->$prop = (!empty($data[$prop])) ? $data[$prop] : null; 
+            $this->$prop = (!empty($data[$prop])) ? $data[$prop] : null;
         }
     }
 

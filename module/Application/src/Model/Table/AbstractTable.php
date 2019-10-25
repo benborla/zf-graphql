@@ -10,6 +10,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\TableGateway\TableGatewayInterface;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
+use Zend\Db\ResultSet\HydratingResultSet;
 
 abstract class AbstractTable
 {
@@ -17,7 +18,7 @@ abstract class AbstractTable
     public $id = 'id';
 
     /** @var \Zend\Db\TableGateway\TableGatewayInterface */
-    private $tableGateway;
+    protected $tableGateway;
 
     /**
      * @param \Zend\Db\TableGateway\TableGatewayInterface $tableGateway
@@ -165,5 +166,96 @@ abstract class AbstractTable
         $paginator = new Paginator($paginatorAdapter);
 
         return $paginator;
+    }
+
+    /**
+     * @param string $table
+     * @param array $haystack
+     *
+     * @return array
+     */
+    protected function extractResultSet(string $table, array $haystack): array
+    {
+        $extracted = [];
+
+        if ($haystack) {
+            foreach ($haystack as $key => $value) {
+                if (strpos($key, $table) !== false) {
+                    $key = trim(str_replace("$table.", null, $key));
+                    $extracted[$key] = $value;
+                }
+            }
+        }
+
+        return $extracted;
+    }
+
+    /**
+     * @param mixed $prefix
+     * @param array $haystack
+     *
+     * @return array
+     */
+    public function removeDataWithPrefix($prefix, $haystack = []): array
+    {
+        $data = [];
+        if ($haystack) {
+            foreach ($haystack as $key => $value) {
+                if (strpos($key, $prefix) !== false) {
+                    unset($data[$key]);
+                } else {
+                    $data[$key] = $value;
+                }
+            }
+        }
+        return $data;
+    }
+
+
+    /**
+     * @param \Zend\Db\ResultSet\HydratingResultSet $resultSet
+     * @param object $objectPrototype
+     * @param object $relationObjectPrototype
+     *
+     * @return \Zend\Db\ResultSet\HydratingResultSet
+     */
+    protected function hydrateRelationPrototypeCollection(
+        HydratingResultSet $resultSet,
+        $objectPrototype,
+        $relationObjectPrototype
+    ): HydratingResultSet {
+
+        if (($object = $resultSet->getObjectPrototype()) instanceof $objectPrototype) {
+            $targetClassName = end(explode('\\', strtolower(get_class($relationObjectPrototype)))) . 's';
+            $data = [];
+
+            $results = $resultSet->toArray();
+
+            foreach ($results as $idx => $result) {
+                $prototype = new $relationObjectPrototype();
+
+                foreach ($this->extractResultSet($targetClassName, $result) as $property => $value) {
+                    if (!is_null($value) || (is_array($value) && !empty($value))) {
+                        $property = end(explode('.', $property));
+                        $prototype->$property = $value;
+                    }
+                }
+
+                foreach ($this->removeDataWithPrefix($targetClassName, $result) as $prototypeProperty => $prototypeValue) {
+                    if (!is_null($prototypeValue) || (is_array($prototypeValue) && !empty($prototypeValue))) {
+                        $object->$prototypeProperty = $prototypeValue;
+                    }
+                }
+
+                $data[] = $prototype;
+            }
+
+            $object->$targetClassName = $data;
+
+            $resultSet->setObjectPrototype($object);
+
+        }
+
+        return $resultSet;
     }
 }

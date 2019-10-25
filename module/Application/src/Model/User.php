@@ -19,7 +19,7 @@ class User extends AbstractModel
     public $created_at;
 
     /** @var \Application\Model\Post[] */
-    private $posts;
+    public $posts;
 
     /** @var array */
     protected $relations = [
@@ -49,7 +49,7 @@ class User extends AbstractModel
     /**
      * @return \Applicaiton\Model\Post[]
      */
-    public function getPosts(): Post
+    public function getPosts(): array
     {
         return $this->posts;
     }

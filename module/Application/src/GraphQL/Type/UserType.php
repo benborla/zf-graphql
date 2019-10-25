@@ -32,6 +32,7 @@ class UserType extends ObjectType
                     'created_at' => [
                         'type' => Type::string()
                     ],
+                    'posts' => Type::string()
                 ];
             },
             'resolveField' => function($user, $args, $context, ResolveInfo $info) {

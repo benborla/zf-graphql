@@ -17,7 +17,7 @@ class UserHydrator extends ObjectPropertyHydrator
     {
         if (!$object instanceof User) {
             throw new \BadMethodCallException(sprintf(
-                '%s expects the provided $object to be a User object)',
+                '%s expects the provided $object to be a User object',
                 __METHOD__
             ));
         }

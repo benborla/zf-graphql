@@ -51,6 +51,26 @@ class Post extends AbstractModel
     }
 
     /**
+     * @return \DateTime
+     */
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     *
+     * @return \Application\Model\Post
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->created_at = $createdAt;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function toArray(): array

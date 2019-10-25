@@ -7,6 +7,7 @@ use Application\GraphQL\Type\UserType;
 use Application\GraphQL\Types;
 use Application\Model\Table\AbstractTable;
 use Application\Model\User;
+use Application\Model\Post;
 use GraphQL\Type\Definition\Type;
 
 class UserTable extends AbstractTable
@@ -20,7 +21,6 @@ class UserTable extends AbstractTable
             'type' => Type::listOf(Types::user()),
             'args' => [
                 'name' => Type::string(),
-                'position' => Type::string(),
             ],
             'resolve' => function ($root, $args) {
                 return $this->fetchAll(false, $args);
@@ -111,4 +111,48 @@ class UserTable extends AbstractTable
         ];
     }
 
+    /**
+     * @param int $id
+     *
+     * @return void
+     */
+    public function get(int $id)
+    {
+        return $this->getUserAndPosts($id)->getObjectPrototype();
+    }
+
+    /**
+     * @param int $id
+     * @param array $criteria
+     *
+     * @return \Zend\Db\Sql\Select
+     */
+    public function getUserAndPosts(int $id, array $criteria = [])
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns([$select::SQL_STAR], true)
+               ->join('posts', 'posts.user_id = users.id', [
+                   // re-alias to identify which is is which
+                   'posts.id' => 'id',
+                   'posts.user' => 'user_id',
+                   'posts.title' => 'title',
+                   'posts.content' => 'content',
+                   'posts.created_at' => 'created_at',
+                ])
+                ->where->equalTo('users.id', $id);
+
+        if (is_array($criteria) && count($criteria)) {
+            foreach ($criteria as $field => $value) {
+                $select->where->like($field, "%$value%");
+            }
+        }
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $this->hydrateRelationPrototypeCollection(
+            $resultSet,
+            new User(),
+            new Post()
+        );
+    }
 }
