@@ -61,19 +61,17 @@ class IndexController extends AbstractActionController
 
     public function debugAction()
     {
-        $user = $this->user->get(2);
-        d($user);
         $posts = $this->user->getUserAndPosts(33);
         dd($posts);
-        dd($this->user::usersQuery());
-        $user = new User();
-        $user->exchangeArray([
-            'id' => 1,
-            'name' => 'test',
-            'position' => 'hello'
-        ]);
+        // dd($this->user::usersQuery());
+        // $user = new User();
+        // $user->exchangeArray([
+        //     'id' => 1,
+        //     'name' => 'test',
+        //     'position' => 'hello'
+        // ]);
 
-        dd($user->getArrayCopy());
+        // dd($user->getArrayCopy());
         // $users = $this->user->fetchAll(false, ['name' => 'Bryan', 'position' => 'Developer']);
         // dd($users);
         // foreach ($this->user->fetchAll(false, ['name' => 'Bryan', 'position' => 'Developer']) as $user) {

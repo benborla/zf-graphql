@@ -226,7 +226,8 @@ abstract class AbstractTable
     ): HydratingResultSet {
 
         if (($object = $resultSet->getObjectPrototype()) instanceof $objectPrototype) {
-            $targetClassName = end(explode('\\', strtolower(get_class($relationObjectPrototype)))) . 's';
+            $targetClassName = explode('\\', strtolower(get_class($relationObjectPrototype)));
+            $targetClassName = end($targetClassName) . 's';
             $data = [];
 
             $results = $resultSet->toArray();
@@ -235,8 +236,12 @@ abstract class AbstractTable
                 $prototype = new $relationObjectPrototype();
 
                 foreach ($this->extractResultSet($targetClassName, $result) as $property => $value) {
-                    if (!is_null($value) || (is_array($value) && !empty($value))) {
-                        $property = end(explode('.', $property));
+                    if (
+                        !is_null($value) || 
+                        (is_array($value) && !empty($value))
+                    ) {
+                        $property = explode('.', $property);
+                        $property = end($property);
                         $prototype->$property = $value;
                     }
                 }

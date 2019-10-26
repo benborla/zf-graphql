@@ -9,6 +9,7 @@ use Application\Model\Post;
 use Application\Model\Table\AbstractTable;
 use Application\Model\User;
 use GraphQL\Type\Definition\Type;
+use Expression;
 
 class UserTable extends AbstractTable
 {
@@ -37,9 +38,10 @@ class UserTable extends AbstractTable
             'type' => Types::user(),
             'args' => [
                 'id' => Type::int(),
+                'postLimit' => Type::int()
             ],
             'resolve' => function ($root, $args) {
-                return $this->get($args['id']);
+                return $this->get($args['id'], $args['postLimit'] ?? 0);
             }
         ];
     }
@@ -111,20 +113,21 @@ class UserTable extends AbstractTable
         ];
     }
 
-    public function fetchAll()
-    {
-        // modify this one so we would be able to fetch posts relationships
-        return parent::fetchAll();
-    }
+    // public function fetchAll(array $criteria)
+    // {
+    //     // modify this one so we would be able to fetch posts relationships
+    //     return parent::fetchAll(false, $criteria);
+    // }
 
     /**
      * @param int $id
+     * @param null|int $postLimit
      *
-     * @return void
+     * @return \Application\Model\User
      */
-    public function get(int $id)
+    public function get(int $id, int $postLimit = 0)
     {
-        return $this->getUserAndPosts($id)->getObjectPrototype();
+        return $this->getUserAndPosts($id, [], $postLimit)->getObjectPrototype();
     }
 
     /**
@@ -133,7 +136,7 @@ class UserTable extends AbstractTable
      *
      * @return \Zend\Db\Sql\Select
      */
-    public function getUserAndPosts(int $id, array $criteria = [])
+    public function getUserAndPosts(int $id, array $criteria = [], int $limit = 0)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->columns([$select::SQL_STAR], true)
@@ -153,10 +156,14 @@ class UserTable extends AbstractTable
             }
         }
 
-        $resultSet = $this->tableGateway->selectWith($select);
+        if ($limit) {
+            $select->limit($limit);
+        }
+
+        // dd($this->tableGateway->getSql()->getSqlstringForSqlObject($select));
 
         return $this->hydrateRelationPrototypeCollection(
-            $resultSet,
+            $this->tableGateway->selectWith($select),
             new User(),
             new Post()
         );
