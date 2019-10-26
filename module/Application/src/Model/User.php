@@ -2,24 +2,39 @@
 
 namespace Application\Model;
 
-use Application\Model\AbstractModel;
+// use Application\Model\AbstractModel;
+use Doctrine\ORM\Mapping as ORM;
 
-class User extends AbstractModel
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="users")
+ */
+class User
 {
-    /** @var int */
-    public $id;
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(name="id")
+     */
+    protected $id;
 
-    /** @var string */
+    /**
+     * @ORM\Column(name="name")
+     */
     public $name;
 
-    /** @var string */
+    /**
+     * @ORM\Column(name="position")
+     */
     public $position;
 
-    /** @var \DateTime */
-    public $created_at;
+    /**
+     * @ORM\Column(name="created_at")
+     */
+    public $createdAt;
 
     /** @var \Application\Model\Post[] */
-    public $posts;
+    private $posts;
 
     /** @var array */
     protected $relations = [
@@ -31,7 +46,87 @@ class User extends AbstractModel
      */
     public function __construct()
     {
-        $this->created_at = date('Y-m-d H:i:s');
+        $this->createdAt = date('Y-m-d H:i:s');
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return \Application\Model\User
+     */
+    public function setId(int $id): User
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return \Application\Model\User
+     */
+    public function setName(string $name): User
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPosition(): string
+    {
+        return $this->position;
+    }
+
+    /**
+     * @param string $position
+     *
+     * @return \Application\Model\User
+     */
+    public function setPosition(string $position): User
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param mixed $createdAt
+     *
+     * @return \Application\Model\User
+     */
+    public function setCreatedAt($createdAt): User
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
     }
 
     /**
@@ -53,4 +148,4 @@ class User extends AbstractModel
     {
         return $this->posts;
     }
-}
+} // End class User

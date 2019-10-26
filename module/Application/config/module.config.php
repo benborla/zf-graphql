@@ -16,6 +16,7 @@ use Zend\ServiceManager\Factory\InvokableFactory;
 use Application\Controller\GraphQLController;
 use Application\Model\Factory\UserTableFactory;
 use Application\Model\Factory\PostTableFactory;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 /**
  * @var \Zend\ServiceManager\ServiceManager $container
@@ -44,33 +45,46 @@ return [
                     ],
                 ],
             ],
-            'graphql' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/query',
-                    'defaults' => [
-                        'controller' => GraphQLController::class,
-                        'action' => 'query'
-                    ]
-                ]
-            ]
+            // 'graphql' => [
+            //     'type' => Literal::class,
+            //     'options' => [
+            //         'route' => '/query',
+            //         'defaults' => [
+            //             'controller' => GraphQLController::class,
+            //             'action' => 'query'
+            //         ]
+            //     ]
+            // ]
         ],
     ],
     'controllers' => [
         'factories' => [
             // IndexController::class => InvokableFactory::class
             IndexController::class => function ($container) {
-                // dd($container);
                 return new IndexController(
-                    $container->get(UserTable::class)
+                    $container->get('doctrine.entitymanager.orm_default')
                 );
             },
-
-            GraphQLController::class => function ($container) {
-                return new GraphQLController(
-                    $container->get(UserTable::class)
-                );
-            }
+            //
+            // GraphQLController::class => function ($container) {
+            //     return new GraphQLController(
+            //         $container->get(UserTable::class)
+            //     );
+            // }
+        ],
+    ],
+    'doctrine' => [
+        'driver' => [
+            __NAMESPACE__ . '_driver' => [
+                'class' => AnnotationDriver::class,
+                'cache' => 'array',
+                'paths' => [__DIR__ . '/../src/Model'],
+            ],
+            'orm_default' => [
+                'drivers' => [
+                    __NAMESPACE__ . '\Model' => __NAMESPACE__ . '_driver'
+                ]
+            ]
         ],
     ],
     'view_manager' => [
@@ -92,9 +106,9 @@ return [
             'ViewJsonStrategy'
         ]
     ],
-    'service_manager' => [
-        'factories' => [
-            UserTable::class => UserTableFactory::class
-        ]
-    ]
+    // 'service_manager' => [
+    //     'factories' => [
+    //         UserTable::class => UserTableFactory::class
+    //     ]
+    // ]
 ];

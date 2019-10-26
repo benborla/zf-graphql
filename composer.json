@@ -22,7 +22,7 @@
         "zendframework/zend-serializer": "^2.9",
         "zendframework/zend-math": "^2.6",
         "ircmaxell/random-lib": "*",
-        "zendframework/zend-hydrator": "^3.0"
+        "doctrine/doctrine-orm-module": "^2.1"
     },
     "autoload": {
         "psr-4": {

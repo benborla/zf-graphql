@@ -16,6 +16,7 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Application\Model\Table\UserTable;
 use Application\Model\User;
+use Doctrine\ORM\EntityManager;
 
 /**
  * @class IndexController
@@ -24,12 +25,12 @@ use Application\Model\User;
  */
 class IndexController extends AbstractActionController
 {
-    /** @var \Application\Model\Table\UserTable */
-    private $user;
+    /** @var \Doctrine\ORM\EntityManager */
+    private $em;
 
-    public function __construct(UserTable $user)
+    public function __construct(EntityManager $em)
     {
-        $this->user = $user;
+        $this->em = $em;
     }
 
     public function indexAction()
@@ -61,8 +62,13 @@ class IndexController extends AbstractActionController
 
     public function debugAction()
     {
-        $posts = $this->user->getUserAndPosts(33);
-        dd($posts);
+        $user = new User();
+        $user->setName('Ian Borla')
+            ->setPosition('Developer');
+
+        $this->em->persist($user);
+        $this->em->flush();
+
         // dd($this->user::usersQuery());
         // $user = new User();
         // $user->exchangeArray([
