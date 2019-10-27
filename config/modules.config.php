@@ -11,6 +11,8 @@
  * This should be an array of module namespaces used in the application.
  */
 return [
+    'ZF\Doctrine\GraphQL',
+    'Zend\Mvc\Console',
     'Zend\Cache',
     'Zend\Form',
     'Zend\InputFilter',
@@ -23,5 +25,19 @@ return [
     'Zend\Validator',
     'DoctrineModule',
     'DoctrineORMModule',
+    'ZF\ApiProblem',
+    'ZF\Hal',
+    'Phpro\DoctrineHydrationModule',
+    'ZF\Versioning',
+    'ZF\ContentNegotiation',
+    'ZF\Rpc',
+    'ZF\MvcAuth',
+    'ZF\Rest',
+    'ZF\ContentValidation',
+    // 'ZF\Apigility',
+    // 'ZF\Apigility\Doctrine\Admin',
+    // 'ZF\Apigility\Doctrine\Server',
+    'ZF\Doctrine\QueryBuilder',
+    'ZF\Doctrine\Criteria',
     'Application',
 ];

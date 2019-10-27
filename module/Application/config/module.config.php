@@ -17,6 +17,8 @@ use Application\Controller\GraphQLController;
 use Application\Model\Factory\UserTableFactory;
 use Application\Model\Factory\PostTableFactory;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Application\Model\User;
+use Application\Model\Factory\UserFactory;
 
 /**
  * @var \Zend\ServiceManager\ServiceManager $container
@@ -45,32 +47,30 @@ return [
                     ],
                 ],
             ],
-            // 'graphql' => [
-            //     'type' => Literal::class,
-            //     'options' => [
-            //         'route' => '/query',
-            //         'defaults' => [
-            //             'controller' => GraphQLController::class,
-            //             'action' => 'query'
-            //         ]
-            //     ]
-            // ]
+            'graphql' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/query',
+                    'defaults' => [
+                        'controller' => GraphQLController::class,
+                        'action' => 'query'
+                    ]
+                ]
+            ]
         ],
     ],
     'controllers' => [
         'factories' => [
-            // IndexController::class => InvokableFactory::class
             IndexController::class => function ($container) {
                 return new IndexController(
                     $container->get('doctrine.entitymanager.orm_default')
                 );
             },
-            //
-            // GraphQLController::class => function ($container) {
-            //     return new GraphQLController(
-            //         $container->get(UserTable::class)
-            //     );
-            // }
+            GraphQLController::class => function ($container) {
+                return new GraphQLController(
+                    $container->get('doctrine.entitymanager.orm_default')
+                );
+            }
         ],
     ],
     'doctrine' => [
@@ -106,9 +106,8 @@ return [
             'ViewJsonStrategy'
         ]
     ],
-    // 'service_manager' => [
-    //     'factories' => [
-    //         UserTable::class => UserTableFactory::class
-    //     ]
-    // ]
+    'service_manager' => [
+        'factories' => [
+        ]
+    ]
 ];

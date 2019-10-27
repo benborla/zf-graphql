@@ -29,7 +29,7 @@ class UserType extends ObjectType
                     'position' => [
                         'type' => Type::string()
                     ],
-                    'created_at' => [
+                    'createdAt' => [
                         'type' => Type::string()
                     ],
                     'posts' => Type::listOf(Types::post())

@@ -1,12 +1,12 @@
 <?php
-
 namespace Application\Model;
 
 // use Application\Model\AbstractModel;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="\Application\Model\Repository\UserRepository")
  * @ORM\Table(name="users")
  */
 class User
@@ -16,7 +16,7 @@ class User
      * @ORM\GeneratedValue
      * @ORM\Column(name="id")
      */
-    protected $id;
+    public $id;
 
     /**
      * @ORM\Column(name="name")
@@ -33,19 +33,18 @@ class User
      */
     public $createdAt;
 
-    /** @var \Application\Model\Post[] */
-    private $posts;
-
-    /** @var array */
-    protected $relations = [
-        'posts'
-    ];
+    /**
+     * @ORM\OneToMany(targetEntity="\Application\Model\Post", mappedBy="user")
+     * @ORM\JoinColumn(name="id", referencedColumnName="user_id")
+     */
+    public $posts;
 
     /**
      * {@inheritDoc}
      */
     public function __construct()
     {
+        $this->posts = new ArrayCollection();
         $this->createdAt = date('Y-m-d H:i:s');
     }
 
@@ -130,22 +129,10 @@ class User
     }
 
     /**
-     * @param \Application\Model\Post[] $post
-     *
-     * @return \Application\Model\User
-     */
-    public function setPosts($post)
-    {
-        $this->posts = $post;
-
-        return $this;
-    }
-
-    /**
      * @return \Applicaiton\Model\Post[]
      */
-    public function getPosts(): array
+    public function getPosts()
     {
-        return $this->posts;
+        return $this->posts->getValues();
     }
 } // End class User

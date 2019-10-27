@@ -1,18 +1,17 @@
 <?php
 namespace Application\Model;
 
-use Application\Model\AbstractModel;
 use Application\Model\User;
+use Application\Model\Post;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Class Post
+ * Class Comment
  * @ORM\Entity
- * @ORM\Table(name="posts")
+ * @ORM\Table(name="comments")
  *
  */
-class Post
+class Comment
 {
     /**
      * @var int
@@ -24,16 +23,10 @@ class Post
 
     /**
      * @var \Application\Model\User
-     * @ORM\ManyToOne(targetEntity="\Application\Model\User", inversedBy="posts")
+     * @ORM\OneToOne(targetEntity="\Application\Model\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     public $user;
-
-    /**
-     * @var string
-     * @ORM\Column(name="title")
-     */
-    public $title;
 
     /**
      * @var string
@@ -42,16 +35,16 @@ class Post
     public $content;
 
     /**
+     * @var \Application\Model\User
+     * @ORM\ManyToOne(targetEntity="\Application\Model\Post", inversedBy="comments")
+     * @ORM\JoinColumn(name="post_id", referencedColumnName="id")
+     */
+    public $post;
+
+    /**
      * @ORM\Column(name="created_at")
      */
     public $createdAt;
-
-    /**
-     * @var \Application\Model\Comment
-     * @ORM\OneToMany(targetEntity="\Application\Model\Comment", mappedBy="post")
-     * @ORM\JoinColumn(name="id", referencedColumnName="post_id")
-     */
-    public $comments;
 
     /**
      * {@inheritDoc}
@@ -59,7 +52,6 @@ class Post
     public function __construct()
     {
         $this->createdAt = date('Y-m-d H:i:s');
-        $this->comments = new ArrayCollection();
     }
 
     /**
@@ -77,25 +69,6 @@ class Post
     public function setId(int $id): Post
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    /**
-     * @param string $title
-     * @return Post
-     */
-    public function setTitle(string $title): Post
-    {
-        $this->title = $title;
 
         return $this;
     }
@@ -138,6 +111,26 @@ class Post
 
         return $this;
     }
+
+    /**
+     * @return Post
+     */
+    public function getPost(): Post
+    {
+        return $this->post;
+    }
+
+    /**
+     * @param Post $post
+     * @return Comment
+     */
+    public function setPost(Post $post): Comment
+    {
+        $this->post = $post;
+
+        return $this;
+    }
+
     /**
      * @param \Application\Model\User $user
      *
@@ -156,13 +149,5 @@ class Post
     public function getUser(): User
     {
         return $this->user;
-    }
-
-    /**
-     * @return \Applicaiton\Model\Comment[]
-     */
-    public function getComments()
-    {
-        return $this->comments->getValues();
     }
 }

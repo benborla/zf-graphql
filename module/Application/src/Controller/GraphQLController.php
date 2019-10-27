@@ -15,75 +15,120 @@ use Application\GraphQL\Type\UserType;
 use Application\GraphQL\Type\QueryType;
 use Application\GraphQL\Types;
 use Application\Model\User;
+use Psr\Container\ContainerInterface;
+use ZF\Doctrine\GraphQL\Type\Loader as TypeLoader;
+use ZF\Doctrine\GraphQL\Filter\Loader as FilterLoader;
+use ZF\Doctrine\GraphQL\Resolve\Loader as ResolveLoader;
+use ZF\Doctrine\GraphQL\Context;
+use Doctrine\ORM\EntityManager;
 
 /**
  * @class GraphQLController
  */
 class GraphQLController extends AbstractActionController
 {
-    /** @var \Application\Model\Table\UserTable */
-    private $user;
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
 
     /**
-     * @param \Application\Model\Table\UserTable $user
+     * @param \Psr\Container\ContainerInterface $container
      */
-    public function __construct(UserTable $user)
+    public function __construct(EntityManager $em)
     {
-        $this->user = $user;
+        $this->em = $em;
     }
 
     /**
-     * @return JsonModel
+     * @return \Zend\View\Model\JsonModel
      */
     public function queryAction()
     {
-        $request  = $this->getDataRequest();
-        $query = $request['query'];
-        $variables = $request['variables'];
-        // $data = $this->user->fetchAll()->toArray();
+        $query = $this->getDataRequest()['query'];
+        $variables = $this->getDataRequest()['variables'];
 
-        // move this to the UserTable
-        // make it static so it can be called here
-        $schema = new Schema([
-            'query' => $this->getQueryConfig(),
-            'mutation' => $this->getMutationConfig()
-        ]);
+        try {
+            $result = GraphQL::executeQuery(
+                $this->getSchema(),
+                $query,
+                null,
+                $this->getContext(),
+                $variables
+            );
 
-        $result = GraphQL::executeQuery($schema, $query, null, null, $variables);
-        $output = $result->toArray();
+            $output = $result->toArray();
+
+        } catch(\Exception $e) {
+            dd($e);
+            $output = [
+                'errors' => [
+                    ['exception' => $e->getMessage()]
+                ]
+            ];
+        }
 
         return new JsonModel($output);
     }
 
     /**
-     * @return \GraphQL\Type\Definition\ObjectType
+     * @return \GraphQL\Type\Schema
      */
-    protected function getQueryConfig(): ObjectType
+    protected function getSchema()
     {
-        return new ObjectType([
-            'name' => 'Query',
-            'fields' => [
-                'users' => $this->user->usersQuery(),
-                'user' => $this->user->userQuery(),
-            ]
+        return new Schema([
+            'query' => new ObjectType([
+                'name' => 'Query',
+                'fields' => [
+                    'users' => $this->em->getRepository(User::class)->getUsersType(),
+                    'user' => $this->em->getRepository(User::class)->getUserType()
+                ]
+            ]),
+            'mutation' => new ObjectType([
+                'name' => 'Mutation',
+                'fields' => [
+                    'createUser' => $this->em->getRepository(User::class)->createUserMutation($this->em),
+                    'updateUser' => $this->em->getRepository(User::class)->updateUserMutation($this->em),
+                    'deleteUser' => $this->em->getRepository(User::class)->deleteUserMutation($this->em)
+
+                ]
+            ])
         ]);
     }
 
     /**
-     * @return ObjectType
+     * @return \ZF\Doctrine\GraphQL\Context
      */
-    protected function getMutationConfig(): ObjectType
+    protected function getContext(): Context
     {
-        $user = new User();
+        return (new Context)
+            ->setLimit(1000)
+            ->setHydratorSection('default')
+            ->setUseHydratorCache(true);
+    }
 
-        return new ObjectType([
-            'name' => 'Mutation',
-            'fields' => [
-                'createUser' => $this->user->createMutation(),
-                'updateUser' => $this->user->updateMutation(),
-                'deleteUser' => $this->user->deleteMutation()
-            ]
-        ]);
+    /**
+     * @return \ZF\Doctrine\GraphQL\Type\Loader
+     */
+    protected function getTypeLoader()
+    {
+        return $this->container->get(TypeLoader::class);
+    }
+
+    /**
+     * @return \ZF\Doctrine\GraphQL\Filter\Loader
+     */
+    protected function getFilterLoader()
+    {
+        return $this->container->get(FilterLoader::class);
+    }
+
+    /**
+     * @return \ZF\Doctrine\GraphQL\Resolve\Loader
+     */
+    protected function getResolveLoader()
+    {
+        return $this->container->get(ResolveLoader::class);
     }
 
     /**
@@ -95,7 +140,6 @@ class GraphQLController extends AbstractActionController
         $input = json_decode($rawInput, true);
         $query = $input['query'];
         $variableValues = isset($input['variables']) ? $input['variables'] : null;
-
         return [
             'query' => $query,
             'variables' => $variableValues

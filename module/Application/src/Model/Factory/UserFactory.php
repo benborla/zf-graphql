@@ -13,24 +13,10 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\ObjectPropertyHydrator;
 use Application\Model\Hydrator\UserHydrator;
 
-class UserTableFactory
+class UserFactory
 {
-    private const TABLE = 'users';
-
     public function __invoke(ContainerInterface $container)
     {
-        $hydrator = new HydratingResultSet(
-            new ObjectPropertyHydrator(),
-            new User()
-        );
-
-        $tableGateway = new TableGateway(
-            self::TABLE,
-            $container->get(AdapterInterface::class),
-            null,
-            $hydrator
-        );
-
-        return new UserTable($tableGateway);
+        return new User();
     }
 }

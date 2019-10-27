@@ -16,6 +16,7 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Application\Model\Table\UserTable;
 use Application\Model\User;
+use Application\Model\Post;
 use Doctrine\ORM\EntityManager;
 
 /**
@@ -60,14 +61,30 @@ class IndexController extends AbstractActionController
         dd("end");
     }
 
+    public function postsAction()
+    {
+        $user = $this->em->getRepository(User::class)->find(2);
+        $post = new Post();
+        $post->setTitle("title");
+        $post->setContent("hello");
+        $post->setUser($user);
+
+
+
+        $this->em->persist($post);
+        $this->em->flush();
+
+         die;
+
+    }
+
     public function debugAction()
     {
-        $user = new User();
-        $user->setName('Ian Borla')
-            ->setPosition('Developer');
-
-        $this->em->persist($user);
-        $this->em->flush();
+        $test = $this->em->getRepository(User::class)->create([
+            'name' => 'Marshall Law',
+            'position' => 'test user'
+        ]);
+        dd($test);
 
         // dd($this->user::usersQuery());
         // $user = new User();
@@ -148,4 +165,4 @@ class IndexController extends AbstractActionController
             'name' => ''
         ]);
     }
-} // End class IndexController
+}
