@@ -6,6 +6,7 @@ namespace Application\GraphQL;
 
 use Application\GraphQL\Type\UserType;
 use Application\GraphQL\Type\PostType;
+use Application\GraphQL\Type\CommentType;
 
 class Types
 {
@@ -18,6 +19,11 @@ class Types
      * @var \Application\GraphQL\Type\PostType
      */
     private static $post;
+
+    /**
+     * @var \Application\GraphQL\Type\CommentType
+     */
+    private static $comment;
 
 
     /**
@@ -34,6 +40,11 @@ class Types
     public static function post(): PostType
     {
         return self::$post ?: (self::$post = new PostType());
+    }
+
+    public static function comment(): CommentType
+    {
+        return self::$comment ?: (self::$comment = new CommentType());
     }
 
 

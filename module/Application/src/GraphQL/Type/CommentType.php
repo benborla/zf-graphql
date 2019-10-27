@@ -4,30 +4,27 @@ declare(strict_types=1);
 
 namespace Application\GraphQL\Type;
 
-use Application\Model\User;
+use Application\Model\Comment;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Application\GraphQL\Types;
 
 /**
- * @class PostType
+ * Class CommentType
  */
-class PostType extends ObjectType
+class CommentType extends ObjectType
 {
     public function __construct()
     {
         $config = [
-            'name' => 'Post',
-            'description' => 'Post collection',
+            'name' => 'Comment',
+            'description' => 'Comment instance type',
             'fields' => function () {
                 return [
                     'id' => Type::int(),
                     'user' => [
                         'type' => Types::user()
-                    ],
-                    'title' => [
-                        'type' => Type::string()
                     ],
                     'content' => [
                         'type' => Type::string()
@@ -35,7 +32,12 @@ class PostType extends ObjectType
                     'created_at' => [
                         'type' => Type::string()
                     ],
-                    'comments' => Type::listOf(Types::comment())
+                    'user' => [
+                        'type' => Types::user(),
+                        'args' => [
+                            'id' => Type::int()
+                        ]
+                    ]
                 ];
             },
             'resolveField' => function($user, $args, $context, ResolveInfo $info) {
